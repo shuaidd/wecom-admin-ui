@@ -6,11 +6,16 @@ export default defineComponent({
 })
 </script>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import CustomerStats from '@/components/customer/CustomerStats.vue'
+import CustomerCharts from '@/components/customer/CustomerCharts.vue'
+</script>
 
 <template>
-  <h1>Dashboard Page</h1>
-  <p>This is the dashboard page</p>
+  <div>
+    <CustomerStats />
+    <CustomerCharts />
+  </div>
 </template>
 
 <style scoped></style>
