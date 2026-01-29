@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企业微信客户管理系统 - UI设计稿</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Ant Design Vue 风格配色 */
+        :root {
+            --primary-color: #1890ff;
+            --primary-hover: #40a9ff;
+            --primary-active: #096dd9;
+            --success-color: #52c41a;
+            --warning-color: #faad14;
+            --error-color: #ff4d4f;
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            background-color: #f0f2f5;
+            overflow: hidden;
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            background: #001529;
+            box-shadow: 2px 0 8px 0 rgba(29,35,41,0.05);
+        }
+
+        .menu-item {
+            transition: all 0.3s;
+            color: rgba(255,255,255,0.65);
+            border-right: 0;
+        }
+
+        .menu-item:hover {
+            color: #fff;
+            background: #1890ff;
+        }
+
+        .menu-item.active {
+            background: #1890ff;
+            color: #fff;
+        }
+
+        /* 卡片样式 */
+        .ant-card {
+            background: #fff;
+            border-radius: 2px;
+            box-shadow: 0 1px 2px -2px rgba(0,0,0,0.16), 0 3px 6px 0 rgba(0,0,0,0.12), 0 5px 12px 4px rgba(0,0,0,0.09);
+            transition: all 0.3s;
+        }
+
+        .ant-card:hover {
+            box-shadow: 0 1px 2px -2px rgba(0,0,0,0.16), 0 5px 12px 0 rgba(0,0,0,0.12), 0 8px 16px 8px rgba(0,0,0,0.09);
+        }
+
+        /* 表格样式 */
+        .ant-table {
+            background: #fff;
+            border-radius: 2px;
+        }
+
+        .ant-table-row:hover {
+            background-color: #e6f7ff !important;
+        }
+
+        /* 标签样式 */
+        .ant-tag {
+            display: inline-block;
+            padding: 0 7px;
+            font-size: 12px;
+            line-height: 20px;
+            border-radius: 2px;
+            border: 1px solid #d9d9d9;
+            background: #fafafa;
+        }
+
+        .ant-tag-blue {
+            color: #1890ff;
+            background: #e6f7ff;
+            border-color: #91d5ff;
+        }
+
+        .ant-tag-green {
+            color: #52c41a;
+            background: #f6ffed;
+            border-color: #b7eb8f;
+        }
+
+        .ant-tag-orange {
+            color: #fa8c16;
+            background: #fff7e6;
+            border-color: #ffd591;
+        }
+
+        .ant-tag-red {
+            color: #f5222d;
+            background: #fff1f0;
+            border-color: #ffa39e;
+        }
+
+        .ant-tag-purple {
+            color: #722ed1;
+            background: #f9f0ff;
+            border-color: #d3adf7;
+        }
+
+        /* 按钮样式 */
+        .ant-btn {
+            transition: all 0.3s;
+            border-radius: 2px;
+            font-weight: 400;
+        }
+
+        .ant-btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .ant-btn-primary:hover {
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        /* 输入框样式 */
+        .ant-input {
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .ant-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(24,144,255,0.2);
+        }
+
+        /* 模态框样式 */
+        .ant-modal-mask {
+            background-color: rgba(0,0,0,0.45);
+        }
+
+        .ant-modal-content {
+            border-radius: 2px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* 时间线样式 */
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -21px;
+            top: 8px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #1890ff;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 1px #1890ff;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 20px;
+            border-left: 2px solid #f0f0f0;
+            margin-left: 8px;
+            padding-bottom: 20px;
+        }
+
+        .timeline-item:last-child {
+            border-left: 2px solid transparent;
+        }
+
+        /* 统计卡片动画 */
+        @keyframes floatUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stat-card {
+            animation: floatUp 0.5s ease-out;
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* 树形结构样式 */
+        .tree-node {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tree-node:hover {
+            background-color: #e6f7ff;
+        }
+
+        .tree-node.selected {
+            background-color: #bae7ff;
+        }
+
+        /* 抽屉样式 */
+        .drawer {
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.9, 0, 0.3, 0.7);
+        }
+
+        .drawer.open {
+            transform: translateX(0);
+        }
+
+        /* 加载动画 */
+        .loading-spin {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* 防止文本溢出 */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="h-screen flex flex-col">
+        <!-- 顶部导航 -->
+        <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-20 relative">
+            <div class="flex items-center gap-4">
+                <div class="w-8 h-8 bg-[#1890ff] rounded flex items-center justify-center text-white font-bold text-lg">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h1 class="text-xl font-semibold text-gray-800 tracking-wide">企业微信客户管理系统</h1>
+                <span class="px-2 py-0.5 bg-blue-100 text-blue-600 text-xs rounded border border-blue-200">MVP v1.0</span>
+            </div>
+            
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-4 text-gray-500">
+                    <button class="hover:text-[#1890ff] transition-colors relative">
+                        <i class="fas fa-bell text-lg"></i>
+                        <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">3</span>
+                    </button>
+                    <button class="hover:text-[#1890ff] transition-colors">
+                        <i class="fas fa-question-circle text-lg"></i>
+                    </button>
+                </div>
+                
+                <div class="flex items-center gap-3 cursor-pointer hover:bg-gray-50 px-3 py-2 rounded transition-colors">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=admin" class="w-8 h-8 rounded-full bg-gray-100" alt="avatar">
+                    <div class="text-sm">
+                        <div class="font-medium text-gray-700">管理员</div>
+                        <div class="text-gray-400 text-xs">admin@company.com</div>
+                    </div>
+                    <i class="fas fa-caret-down text-gray-400"></i>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex flex-1 overflow-hidden">
+            <!-- 侧边栏 -->
+            <aside class="sidebar w-64 flex flex-col text-sm">
+                <div class="p-4 text-gray-400 text-xs uppercase tracking-wider font-semibold">
+                    主导航
+                </div>
+                
+                <nav class="flex-1 overflow-y-auto">
+                    <div v-for="item in menuItems" :key="item.key" 
+                         @click="currentView = item.key"
+                         class="menu-item px-6 py-4 cursor-pointer flex items-center gap-3"
+                         :class="{ 'active': currentView === item.key }">
+                        <i :class="item.icon" class="w-5 text-center"></i>
+                        <span class="font-medium">{{ item.label }}</span>
+                        <span v-if="item.badge" class="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                            {{ item.badge }}
+                        </span>
+                    </div>
+                </nav>
+
+                <div class="p-4 border-t border-gray-700">
+                    <div class="flex items-center gap-3 text-gray-400 hover:text-white cursor-pointer transition-colors">
+                        <i class="fas fa-cog"></i>
+                        <span>系统设置</span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 主内容区 -->
+            <main class="flex-1 overflow-y-auto p-6 bg-[#f0f2f5]">
+                
+                <!-- Dashboard 视图 -->
+                <div v-if="currentView === 'dashboard'" class="space-y-6">
+                    <!-- 统计卡片 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div v-for="(stat, index) in statistics" :key="index" 
+                             class="ant-card p-6 stat-card" :style="{ animationDelay: index * 0.1 + 's' }">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-gray-500 text-sm mb-1">{{ stat.title }}</p>
+                                    <h3 class="text-3xl font-bold text-gray-800">{{ stat.value }}</h3>
+                                    <div class="flex items-center gap-2 mt-2 text-xs">
+                                        <span :class="stat.trend > 0 ? 'text-green-500' : 'text-red-500'">
+                                            <i :class="stat.trend > 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
+                                            {{ Math.abs(stat.trend) }}%
+                                        </span>
+                                        <span class="text-gray-400">较上周</span>
+                                    </div>
+                                </div>
+                                <div :class="stat.bgColor" class="w-12 h-12 rounded-lg flex items-center justify-center text-2xl text-white">
+                                    <i :class="stat.icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 图表区域 -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- 客户增长趋势 -->
+                        <div class="ant-card p-6 lg:col-span-2">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="font-semibold text-gray-800">客户增长趋势</h3>
+                                <div class="flex gap-2">
+                                    <button class="px-3 py-1 text-xs border rounded hover:border-[#1890ff] hover:text-[#1890ff] transition-colors">近7天</button>
+                                    <button class="px-3 py-1 text-xs bg-[#1890ff] text-white rounded">近30天</button>
+                                </div>
+                            </div>
+                            <div class="h-64 flex items-end justify-between gap-2 px-4">
+                                <div v-for="(bar, idx) in chartData" :key="idx" class="flex-1 flex flex-col items-center gap-2 group cursor-pointer">
+                                    <div class="w-full bg-blue-100 rounded-t-sm relative overflow-hidden transition-all duration-300 group-hover:bg-blue-200" 
+                                         :style="{ height: bar.value + 'px' }">
+                                        <div class="absolute bottom-0 w-full bg-[#1890ff] transition-all duration-300" 
+                                             :style="{ height: (bar.value * 0.6) + 'px' }"></div>
+                                    </div>
+                                    <span class="text-xs text-gray-500">{{ bar.label }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 员工业绩排行 -->
+                        <div class="ant-card p-6">
+                            <h3 class="font-semibold text-gray-800 mb-6">员工业绩排行</h3>
+                            <div class="space-y-4">
+                                <div v-for="(emp, idx) in topEmployees" :key="idx" 
+                                     class="flex items-center gap-3 p-3 rounded hover:bg-gray-50 transition-colors cursor-pointer">
+                                    <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                                         :class="idx < 3 ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-100 text-gray-500'">
+                                        {{ idx + 1 }}
+                                    </div>
+                                    <img :src="emp.avatar" class="w-10 h-10 rounded-full bg-gray-100">
+                                    <div class="flex-1">
+                                        <div class="font-medium text-sm text-gray-800">{{ emp.name }}</div>
+                                        <div class="text-xs text-gray-400">{{ emp.position }}</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="font-semibold text-[#1890ff]">{{ emp.count }}</div>
+                                        <div class="text-xs text-gray-400">跟进客户</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 最近跟进记录 -->
+                    <div class="ant-card p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-semibold text-gray-800">最近跟进记录</h3>
+                            <button @click="currentView = 'follows'" class="text-[#1890ff] hover:underline text-sm">查看全部</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50 text-gray-600 text-xs uppercase">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left font-semibold">客户</th>
+                                        <th class="px-4 py-3 text-left font-semibold">跟进人</th>
+                                        <th class="px-4 py-3 text-left font-semibold">跟进方式</th>
+                                        <th class="px-4 py-3 text-left font-semibold">内容摘要</th>
+                                        <th class="px-4 py-3 text-left font-semibold">时间</th>
+                                        <th class="px-4 py-3 text-left font-semibold">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    <tr v-for="record in recentFollows" :key="record.id" class="hover:bg-blue-50 transition-colors text-sm">
+                                        <td class="px-4 py-3">
+                                            <div class="flex items-center gap-2">
+                                                <img :src="record.customerAvatar" class="w-8 h-8 rounded-full bg-gray-100">
+                                                <span class="font-medium text-gray-800">{{ record.customerName }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3 text-gray-600">{{ record.employeeName }}</td>
+                                        <td class="px-4 py-3">
+                                            <span class="ant-tag" :class="getFollowTypeClass(record.type)">
+                                                <i :class="getFollowTypeIcon(record.type)" class="mr-1"></i>
+                                                {{ record.typeText }}
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-3 text-gray-600 max-w-xs truncate">{{ record.content }}</td>
+                                        <td class="px-4 py-3 text-gray-400 text-xs">{{ record.time }}</td>
+                                        <td class="px-4 py-3">
+                                            <button class="text-[#1890ff] hover:text-[#40a9ff] text-xs">详情</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 客户管理视图 -->
+                <div v-if="currentView === 'customers'" class="space-y-6">
+                    <!-- 搜索筛选栏 -->
+                    <div class="ant-card p-4">
+                        <div class="flex flex-wrap gap-4 items-center justify-between">
+                            <div class="flex gap-4 flex-wrap">
+                                <div class="relative">
+                                    <input type="text" placeholder="搜索客户姓名/公司/手机号" 
+                                           class="ant-input pl-10 pr-4 py-2 border border-gray-300 w-64 focus:outline-none">
+                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                </div>
+                                
+                                <select class="ant-input px-3 py-2 border border-gray-300 focus:outline-none">
+                                    <option>所有状态</option>
+                                    <option>正常</option>
+                                    <option>已流失</option>
+                                </select>
+
+                                <select class="ant-input px-3 py-2 border border-gray-300 focus:outline-none">
+                                    <option>所有标签</option>
+                                    <option>高意向</option>
+                                    <option>待跟进</option>
+                                    <option>VIP客户</option>
+                                </select>
+                            </div>
+                            
+                            <div class="flex gap-3">
+                                <button class="ant-btn px-4 py-2 border border-gray-300 rounded hover:border-[#1890ff] hover:text-[#1890ff] transition-colors">
+                                    <i class="fas fa-download mr-2"></i>导出
+                                </button>
+                                <button @click="showSyncModal = true" class="ant-btn px-4 py-2 bg-[#1890ff] text-white rounded hover:bg-[#40a9ff] transition-colors">
+                                    <i class="fas fa-sync mr-2"></i>同步客户
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 标签快捷筛选 -->
+                        <div class="mt-4 flex gap-2 flex-wrap">
+                            <span class="text-gray-500 text-sm py-1">快捷筛选:</span>
+                            <span v-for="tag in quickTags" :key="tag" 
+                                  @click="toggleTag(tag)"
+                                  class="ant-tag cursor-pointer hover:opacity-80 transition-opacity"
+                                  :class="{ 'ant-tag-blue': selectedTags.includes(tag) }">
+                                {{ tag }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- 客户列表 -->
+                    <div class="ant-card">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50 text-gray-600 text-xs uppercase border-b border-gray-200">
+                                    <tr>
+                                        <th class="px-4 py-4 text-left font-semibold w-12">
+                                            <input type="checkbox" class="rounded border-gray-300">
+                                        </th>
+                                        <th class="px-4 py-4 text-left font-semibold">客户信息</th>
+                                        <th class="px-4 py-4 text-left font-semibold">公司/职位</th>
+                                        <th class="px-4 py-4 text-left font-semibold">标签</th>
+                                        <th class="px-4 py-4 text-left font-semibold">跟进人</th>
+                                        <th class="px-4 py-4 text-left font-semibold">最近跟进</th>
+                                        <th class="px-4 py-4 text-left font-semibold">状态</th>
+                                        <th class="px-4 py-4 text-left font-semibold">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    <tr v-for="customer in customers" :key="customer.id" class="hover:bg-blue-50 transition-colors group">
+                                        <td class="px-4 py-4">
+                                            <input type="checkbox" class="rounded border-gray-300">
+                                        </td>
+                                        <td class="px-4 py-4">
+                                            <div class="flex items-center gap-3">
+                                                <img :src="customer.avatar" class="w-10 h-10 rounded-full bg-gray-100 object-cover">
+                                                <div>
+                                                    <div class="font-medium text-gray-800 flex items-center gap-2">
+                                                        {{ customer.name }}
+                                                        <i v-if="customer.gender === 1" class="fas fa-mars text-blue-400 text-xs"></i>
+                                                        <i v-if="customer.gender === 2" class="fas fa-venus text-pink-400 text-xs"></i>
+                                                    </div>
+                                                    <div class="text-xs text-gray-400 mt-0.5">{{ customer.externalUserid }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-4">
+                                            <div class="text-sm text-gray-800">{{ customer.corpName || '个人客户' }}</div>
+                                            <div class="text-xs text-gray-400 mt-0.5">{{ customer.position || '-' }}</div>
+                                        </td>
+                                        <td class="px-4 py-4">
+                                            <div class="flex gap-1 flex-wrap">
+                                                <span v-for="tag in customer.tags.slice(0, 3)" :key="tag" 
+                                                      class="ant-tag text-xs" :class="'ant-tag-' + tag.color">
+                                                    {{ tag.name }}
+                                                </span>
+                                                <span v-if="customer.tags.length > 3" class="text-xs text-gray-400">+{{ customer.tags.length - 3 }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-4">
+                                            <div class="flex -space-x-2">
+                                                <img v-for="emp in customer.followers.slice(0, 3)" :key="emp.id" 
+                                                     :src="emp.avatar" class="w-8 h-8 rounded-full border-2 border-white bg-gray-100" 
+                                                     :title="emp.name">
+                                                <div v-if="customer.followers.length > 3" 
+                                                     class="w-8 h-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-xs text-gray-600">
+                                                    +{{ customer.followers.length - 3 }}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">
+                                            <div>{{ customer.lastFollowTime || '无' }}</div>
+                                            <div class="text-xs text-gray-400 mt-0.5">{{ customer.followCount }}次跟进</div>
+                                        </td>
+                                        <td class="px-4 py-4">
+                                            <span class="ant-tag" :class="customer.status === 'normal' ? 'ant-tag-green' : 'ant-tag-orange'">
+                                                {{ customer.status === 'normal' ? '正常' : '已流失' }}
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-4">
+                                            <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button @click="openCustomerDetail(customer)" 
+                                                        class="text-[#1890ff] hover:text-[#40a9ff] text-sm font-medium">详情</button>
+                                                <button class="text-gray-400 hover:text-[#1890ff] text-sm">跟进</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- 分页 -->
+                        <div class="p-4 border-t border-gray-200 flex items-center justify-between">
+                            <span class="text-sm text-gray-500">共 {{ totalCustomers }} 条记录</span>
+                            <div class="flex gap-2">
+                                <button class="px-3 py-1 border border-gray-300 rounded hover:border-[#1890ff] disabled:opacity-50" disabled>
+                                    <i class="fas fa-chevron-left text-xs"></i>
+                                </button>
+                                <button class="px-3 py-1 bg-[#1890ff] text-white rounded text-sm">1</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded hover:border-[#1890ff] text-sm">2</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded hover:border-[#1890ff] text-sm">3</button>
+                                <span class="px-2 text-gray-400">...</span>
+                                <button class="px-3 py-1 border border-gray-300 rounded hover:border-[#1890ff] text-sm">10</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded hover:border-[#1890ff]">
+                                    <i class="fas fa-chevron-right text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 员工管理视图 -->
+                <div v-if="currentView === 'employees'" class="space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-140px)]">
+                        <!-- 部门树 -->
+                        <div class="ant-card p-4 lg:col-span-1 overflow-hidden flex flex-col">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-semibold text-gray-800">组织架构</h3>
+                                <button class="text-[#1890ff] text-sm hover:underline">展开全部</button>
+                            </div>
+                            <div class="flex-1 overflow-y-auto space-y-1">
+                                <div v-for="dept in departments" :key="dept.id" 
+                                     class="tree-node px-3 py-2 rounded flex items-center gap-2"
+                                     :class="{ 'selected': selectedDept === dept.id }"
+                                     @click="selectedDept = dept.id"
+                                     :style="{ paddingLeft: (dept.level * 20 + 12) + 'px' }">
+                                    <i v-if="dept.children" class="fas fa-caret-down text-gray-400 text-xs"></i>
+                                    <i v-else class="fas fa-building text-gray-400 text-xs"></i>
+                                    <span class="text-sm text-gray-700 flex-1">{{ dept.name }}</span>
+                                    <span class="text-xs text-gray-400">{{ dept.count }}人</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 员工列表 -->
+                        <div class="ant-card p-6 lg:col-span-3 overflow-hidden flex flex-col">
+                            <div class="flex justify-between items-center mb-6">
+                                <div>
+                                    <h3 class="font-semibold text-gray-800 text-lg">销售部</h3>
+                                    <p class="text-sm text-gray-400 mt-1">共 {{ employees.length }} 名员工</p>
+                                </div>
+                                <div class="flex gap-3">
+                                    <div class="relative">
+                                        <input type="text" placeholder="搜索员工" 
+                                               class="ant-input pl-9 pr-4 py-2 border border-gray-300 w-64 focus:outline-none">
+                                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                    </div>
+                                    <button class="ant-btn px-4 py-2 bg-[#1890ff] text-white rounded hover:bg-[#40a9ff]">
+                                        <i class="fas fa-sync mr-2"></i>同步
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="flex-1 overflow-y-auto">
+                                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                                    <div v-for="emp in employees" :key="emp.id" 
+                                         class="border border-gray-200 rounded p-4 hover:shadow-md transition-shadow cursor-pointer group">
+                                        <div class="flex items-start justify-between">
+                                            <div class="flex gap-3">
+                                                <img :src="emp.avatar" class="w-12 h-12 rounded bg-gray-100">
+                                                <div>
+                                                    <h4 class="font-semibold text-gray-800 flex items-center gap-2">
+                                                        {{ emp.name }}
+                                                        <span v-if="emp.status === 1" class="w-2 h-2 bg-green-500 rounded-full" title="在职"></span>
+                                                    </h4>
+                                                    <p class="text-sm text-gray-500">{{ emp.position }}</p>
+                                                </div>
+                                            </div>
+                                            <button class="text-gray-300 hover:text-[#1890ff]">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="mt-4 space-y-2 text-sm text-gray-600">
+                                            <div class="flex items-center gap-2">
+                                                <i class="fas fa-mobile-alt text-gray-400 w-4"></i>
+                                                <span>{{ emp.mobile || '未绑定' }}</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <i class="fas fa-envelope text-gray-400 w-4"></i>
+                                                <span class="truncate">{{ emp.email || '未绑定' }}</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <i class="fas fa-user-tie text-gray-400 w-4"></i>
+                                                <span>{{ emp.customer_count }} 位跟进客户</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-4 pt-3 border-t border-gray-100 flex gap-2">
+                                            <button class="flex-1 py-1.5 text-xs border border-[#1890ff] text-[#1890ff] rounded hover:bg-blue-50 transition-colors">
+                                                查看客户
+                                            </button>
+                                            <button class="flex-1 py-1.5 text-xs bg-[#1890ff] text-white rounded hover:bg-[#40a9ff] transition-colors">
+                                                跟进记录
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 跟进记录视图 -->
+                <div v-if="currentView === 'follows'" class="space-y-6">
+                    <div class="flex justify-between items-center">
+                        <div class="flex gap-4">
+                            <div class="relative">
+                                <input type="text" placeholder="搜索客户或跟进人" 
+                                       class="ant-input pl-10 pr-4 py-2 border border-gray-300 w-80 focus:outline-none rounded">
+                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                            </div>
+                            <select class="ant-input px-4 py-2 border border-gray-300 focus:outline-none rounded">
+                                <option>所有跟进方式</option>
+                                <option>电话沟通</option>
+                                <option>微信沟通</option>
+                                <option>线下拜访</option>
+                                <option>邮件往来</option>
+                            </select>
+                        </div>
+                        <button @click="showAddFollowModal = true" class="ant-btn px-6 py-2 bg-[#1890ff] text-white rounded hover:bg-[#40a9ff] shadow-sm">
+                            <i class="fas fa-plus mr-2"></i>新建跟进
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- 时间线视图 -->
+                        <div class="lg:col-span-2 space-y-4">
+                            <div v-for="(group, date) in groupedFollows" :key="date" class="ant-card p-6">
+                                <div class="flex items-center gap-4 mb-6">
+                                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-[#1890ff] font-bold">
+                                        {{ date.split('-')[2] }}
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">{{ date }}</h4>
+                                        <p class="text-sm text-gray-400">{{ group.length }} 条跟进记录</p>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-6 ml-6">
+                                    <div v-for="record in group" :key="record.id" class="timeline-item">
+                                        <div class="bg-gray-50 rounded-lg p-4 hover:bg-blue-50 transition-colors cursor-pointer">
+                                            <div class="flex justify-between items-start mb-3">
+                                                <div class="flex items-center gap-3">
+                                                    <img :src="record.customerAvatar" class="w-10 h-10 rounded-full bg-gray-100">
+                                                    <div>
+                                                        <div class="font-medium text-gray-800">{{ record.customerName }}</div>
+                                                        <div class="text-xs text-gray-400">{{ record.corpName }}</div>
+                                                    </div>
+                                                </div>
+                                                <span class="ant-tag" :class="getFollowTypeClass(record.type)">
+                                                    {{ record.typeText }}
+                                                </span>
+                                            </div>
+                                            
+                                            <p class="text-gray-700 text-sm leading-relaxed mb-3">{{ record.content }}</p>
+                                            
+                                            <div v-if="record.feedback" class="bg-white p-3 rounded border-l-4 border-[#1890ff] text-sm text-gray-600 mb-3">
+                                                <span class="text-[#1890ff] font-medium">客户反馈：</span>{{ record.feedback }}
+                                            </div>
+
+                                            <div class="flex items-center justify-between text-xs text-gray-400">
+                                                <div class="flex items-center gap-2">
+                                                    <img :src="record.employeeAvatar" class="w-6 h-6 rounded-full">
+                                                    <span>{{ record.employeeName }}</span>
+                                                    <span>•</span>
+                                                    <span>{{ record.time }}</span>
+                                                    <span v-if="record.duration" class="flex items-center gap-1">
+                                                        <i class="far fa-clock"></i>
+                                                        {{ record.duration }}分钟
+                                                    </span>
+                                                </div>
+                                                <div class="flex gap-3">
+                                                    <button class="hover:text-[#1890ff]">编辑</button>
+                                                    <button class="hover:text-red-500">删除</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 待办事项 -->
+                        <div class="space-y-4">
+                            <div class="ant-card p-6 bg-gradient-to-br from-blue-50 to-white border-blue-100">
+                                <h3 class="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                    <i class="fas fa-clock text-[#1890ff]"></i>
+                                    今日待跟进
+                                </h3>
+                                <div class="space-y-3">
+                                    <div v-for="todo in todayTodos" :key="todo.id" 
+                                         class="bg-white p-3 rounded border border-blue-100 hover:shadow-sm transition-shadow cursor-pointer">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <span class="font-medium text-sm text-gray-800">{{ todo.customerName }}</span>
+                                            <span class="text-xs text-orange-500 bg-orange-50 px-2 py-0.5 rounded">{{ todo.time }}</span>
+                                        </div>
+                                        <p class="text-xs text-gray-500 line-clamp-2">{{ todo.plan }}</p>
+                                    </div>
+                                    <div v-if="todayTodos.length === 0" class="text-center text-gray-400 py-8 text-sm">
+                                        今日暂无待办事项
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="ant-card p-6">
+                                <h3 class="font-semibold text-gray-800 mb-4">跟进统计</h3>
+                                <div class="space-y-4">
+                                    <div v-for="stat in followStats" :key="stat.type" class="flex items-center justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-full flex items-center justify-center" :class="stat.bgColor">
+                                                <i :class="stat.icon" class="text-white text-sm"></i>
+                                            </div>
+                                            <span class="text-sm text-gray-600">{{ stat.name }}</span>
+                                        </div>
+                                        <span class="font-semibold text-gray-800">{{ stat.count }}次</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+
+        <!-- 客户详情抽屉 -->
+        <div v-if="customerDetailVisible" class="fixed inset-0 z-50 flex justify-end">
+            <div class="ant-modal-mask absolute inset-0" @click="customerDetailVisible = false"></div>
+            <div class="drawer open bg-white w-[600px] h-full shadow-2xl relative z-10 flex flex-col" :class="{ 'open': customerDetailVisible }">
+                <div class="p-6 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                    <h2 class="text-lg font-semibold text-gray-800">客户详情</h2>
+                    <button @click="customerDetailVisible = false" class="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto p-6" v-if="selectedCustomer">
+                    <div class="flex items-center gap-4 mb-6">
+                        <img :src="selectedCustomer.avatar" class="w-20 h-20 rounded-full bg-gray-100 border-4 border-blue-50">
+                        <div class="flex-1">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-1">{{ selectedCustomer.name }}</h3>
+                            <p class="text-gray-500 text-sm mb-2">{{ selectedCustomer.corpName }} · {{ selectedCustomer.position }}</p>
+                            <div class="flex gap-2">
+                                <span v-for="tag in selectedCustomer.tags" :key="tag.id" class="ant-tag" :class="'ant-tag-' + tag.color">
+                                    {{ tag.name }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                            <h4 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                <i class="fas fa-info-circle text-[#1890ff]"></i>
+                                基本信息
+                            </h4>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <span class="text-gray-400">客户ID：</span>
+                                    <span class="text-gray-700 font-mono">{{ selectedCustomer.externalUserid }}</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-400">添加时间：</span>
+                                    <span class="text-gray-700">{{ selectedCustomer.created_at }}</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-400">客户来源：</span>
+                                    <span class="text-gray-700">{{ selectedCustomer.source || '未知' }}</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-400">UnionID：</span>
+                                    <span class="text-gray-700 font-mono text-xs">{{ selectedCustomer.unionid || '-' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                <i class="fas fa-users text-[#1890ff]"></i>
+                                跟进人信息
+                            </h4>
+                            <div class="space-y-3">
+                                <div v-for="follower in selectedCustomer.followers" :key="follower.id" 
+                                     class="border border-gray-200 rounded-lg p-4 hover:border-[#1890ff] transition-colors">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="flex items-center gap-3">
+                                            <img :src="follower.avatar" class="w-10 h-10 rounded-full bg-gray-100">
+                                            <div>
+                                                <div class="font-medium text-gray-800">{{ follower.name }}</div>
+                                                <div class="text-xs text-gray-400">添加于 {{ follower.addTime }}</div>
+                                            </div>
+                                        </div>
+                                        <button class="text-[#1890ff] text-sm hover:underline">查看记录</button>
+                                    </div>
+                                    <div class="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                                        <div class="mb-1"><span class="text-gray-400">备注：</span>{{ follower.remark || '无' }}</div>
+                                        <div><span class="text-gray-400">描述：</span>{{ follower.description || '无' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                <i class="fas fa-history text-[#1890ff]"></i>
+                                最近跟进记录
+                            </h4>
+                            <div class="space-y-3">
+                                <div v-for="record in selectedCustomer.recentFollows" :key="record.id" 
+                                     class="border-l-2 border-[#1890ff] pl-4 py-2">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <span class="ant-tag" :class="getFollowTypeClass(record.type)">{{ record.typeText }}</span>
+                                        <span class="text-xs text-gray-400">{{ record.time }}</span>
+                                    </div>
+                                    <p class="text-sm text-gray-700">{{ record.content }}</p>
+                                </div>
+                                <button class="w-full py-2 text-[#1890ff] text-sm border border-dashed border-[#1890ff] rounded hover:bg-blue-50 transition-colors">
+                                    查看全部 {{ selectedCustomer.followCount }} 条记录
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 border-t border-gray-200 bg-gray-50 flex gap-3">
+                    <button class="flex-1 py-2 bg-[#1890ff] text-white rounded hover:bg-[#40a9ff] transition-colors">
+                        <i class="fas fa-edit mr-2"></i>编辑客户
+                    </button>
+                    <button class="flex-1 py-2 border border-gray-300 rounded hover:border-[#1890ff] hover:text-[#1890ff] transition-colors">
+                        <i class="fas fa-phone mr-2"></i>立即跟进
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 新建跟进弹窗 -->
+        <div v-if="showAddFollowModal" class="fixed inset-0 z-50 flex items-center justify-center">
+            <div class="ant-modal-mask absolute inset-0" @click="showAddFollowModal = false"></div>
+            <div class="ant-modal-content bg-white w-[600px] rounded shadow-2xl relative z-10 max-h-[90vh] overflow-y-auto">
+                <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-gray-800">新建跟进记录</h3>
+                    <button @click="showAddFollowModal = false" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">选择客户 <span class="text-red-500">*</span></label>
+                        <select class="ant-input w-full px-3 py-2 border border-gray-300 rounded focus:outline-none">
+                            <option>请选择客户</option>
+                            <option v-for="c in customers.slice(0, 5)" :key="c.id">{{ c.name }} - {{ c.corpName }}</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">跟进方式 <span class="text-red-500">*</span></label>
+                            <select class="ant-input w-full px-3 py-2 border border-gray-300 rounded focus:outline-none">
+                                <option value="phone">电话沟通</option>
+                                <option value="wechat">微信沟通</option>
+                                <option value="meeting">线下拜访</option>
+                                <option value="email">邮件往来</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">跟进时间</label>
+                            <input type="datetime-local" class="ant-input w-full px-3 py-2 border border-gray-300 rounded focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">跟进内容 <span class="text-red-500">*</span></label>
+                        <textarea rows="4" placeholder="请输入跟进内容..." 
+                                  class="ant-input w-full px-3 py-2 border border-gray-300 rounded focus:outline-none resize-none"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">客户反馈</label>
+                        <textarea rows="2" placeholder="记录客户的反馈或需求..." 
+                                  class="ant-input w-full px-3 py-2 border border-gray-300 rounded focus:outline-none resize-none"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">下次跟进计划</label>
+                        <div class="flex gap-2 mb-2">
+                            <input type="datetime-local" class="ant-input flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none">
+                        </div>
+                        <input type="text" placeholder="下次跟进的目标或计划..." 
+                               class="ant-input w-full px-3 py-2 border border-gray-300 rounded focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">附件/图片</label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#1890ff] transition-colors cursor-pointer">
+                            <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                            <p class="text-gray-500 text-sm">点击上传或拖拽文件到此处</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6 border-t border-gray-200 flex justify-end gap-3">
+                    <button @click="showAddFollowModal = false" class="px-6 py-2 border border-gray-300 rounded hover:border-[#1890ff] hover:text-[#1890ff] transition-colors">
+                        取消
+                    </button>
+                    <button class="px-6 py-2 bg-[#1890ff] text-white rounded hover:bg-[#40a9ff] transition-colors">
+                        保存记录
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 同步弹窗 -->
+        <div v-if="showSyncModal" class="fixed inset-0 z-50 flex items-center justify-center">
+            <div class="ant-modal-mask absolute inset-0" @click="showSyncModal = false"></div>
+            <div class="ant-modal-content bg-white w-[500px] rounded shadow-2xl relative z-10 p-6">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-sync-alt text-2xl text-[#1890ff]" :class="{ 'loading-spin': isSyncing }"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">同步企业微信客户</h3>
+                    <p class="text-gray-500 text-sm">将从企业微信同步最新的客户数据、标签和员工信息</p>
+                </div>
+
+                <div v-if="!isSyncing && !syncComplete" class="space-y-3 mb-6">
+                    <label class="flex items-center gap-3 p-3 border border-gray-200 rounded cursor-pointer hover:border-[#1890ff] transition-colors">
+                        <input type="checkbox" checked class="rounded text-[#1890ff]">
+                        <div>
+                            <div class="font-medium text-gray-800">客户数据</div>
+                            <div class="text-xs text-gray-400">同步客户基本信息和标签</div>
+                        </div>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 border border-gray-200 rounded cursor-pointer hover:border-[#1890ff] transition-colors">
+                        <input type="checkbox" checked class="rounded text-[#1890ff]">
+                        <div>
+                            <div class="font-medium text-gray-800">员工通讯录</div>
+                            <div class="text-xs text-gray-400">同步组织架构和员工信息</div>
+                        </div>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 border border-gray-200 rounded cursor-pointer hover:border-[#1890ff] transition-colors">
+                        <input type="checkbox" class="rounded text-[#1890ff]">
+                        <div>
+                            <div class="font-medium text-gray-800">历史跟进记录</div>
+                            <div class="text-xs text-gray-400">同步聊天消息作为跟进记录</div>
+                        </div>
+                    </label>
+                </div>
+
+                <div v-if="isSyncing" class="mb-6">
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-gray-600">正在同步...</span>
+                        <span class="text-[#1890ff]">{{ syncProgress }}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-[#1890ff] h-2 rounded-full transition-all duration-300" :style="{ width: syncProgress + '%' }"></div>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2 text-center">{{ syncStatusText }}</p>
+                </div>
+
+                <div v-if="syncComplete" class="text-center mb-6">
+                    <div class="text-green-500 text-5xl mb-2"><i class="fas fa-check-circle"></i></div>
+                    <p class="text-gray-800 font-medium">同步完成</p>
+                    <p class="text-sm text-gray-500 mt-1">成功同步 {{ syncResult.success }} 条，失败 {{ syncResult.failed }} 条</p>
+                </div>
+
+                <div class="flex gap-3">
+                    <button v-if="!isSyncing && !syncComplete" @click="showSyncModal = false" class="flex-1 py-2 border border-gray-300 rounded hover:border-[#1890ff] hover:text-[#1890ff] transition-colors">
+                        取消
+                    </button>
+                    <button v-if="!isSyncing && !syncComplete" @click="startSync" class="flex-1 py-2 bg-[#1890ff] text-white rounded hover:bg-[#40a9ff] transition-colors">
+                        开始同步
+                    </button>
+                    <button v-if="syncComplete" @click="showSyncModal = false; syncComplete = false;" class="w-full py-2 bg-[#1890ff] text-white rounded hover:bg-[#40a9ff] transition-colors">
+                        完成
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    currentView: 'dashboard',
+                    customerDetailVisible: false,
+                    showAddFollowModal: false,
+                    showSyncModal: false,
+                    isSyncing: false,
+                    syncProgress: 0,
+                    syncComplete: false,
+                    syncStatusText: '正在连接企业微信服务器...',
+                    syncResult: { success: 0, failed: 0 },
+                    selectedCustomer: null,
+                    selectedDept: 1,
+                    selectedTags: [],
+                    
+                    menuItems: [
+                        { key: 'dashboard', label: '数据概览', icon: 'fas fa-chart-line', badge: null },
+                        { key: 'customers', label: '客户管理', icon: 'fas fa-users', badge: 12 },
+                        { key: 'employees', label: '员工通讯录', icon: 'fas fa-address-book', badge: null },
+                        { key: 'follows', label: '跟进记录', icon: 'fas fa-tasks', badge: 5 },
+                        { key: 'tags', label: '标签管理', icon: 'fas fa-tags', badge: null },
+                        { key: 'sync', label: '同步日志', icon: 'fas fa-history', badge: null }
+                    ],
+
+                    statistics: [
+                        { title: '客户总数', value: '1,284', trend: 12.5, icon: 'fas fa-users', bgColor: 'bg-blue-500' },
+                        { title: '今日新增', value: '28', trend: 8.2, icon: 'fas fa-user-plus', bgColor: 'bg-green-500' },
+                        { title: '今日跟进', value: '156', trend: -3.1, icon: 'fas fa-phone', bgColor: 'bg-purple-500' },
+                        { title: '待跟进', value: '43', trend: 5.4, icon: 'fas fa-clock', bgColor: 'bg-orange-500' }
+                    ],
+
+                    chartData: [
+                        { label: '01-20', value: 40 },
+                        { label: '01-21', value: 65 },
+                        { label: '01-22', value: 45 },
+                        { label: '01-23', value: 80 },
+                        { label: '01-24', value: 55 },
+                        { label: '01-25', value: 90 },
+                        { label: '01-26', value: 70 }
+                    ],
+
+                    topEmployees: [
+                        { name: '李销售', position: '销售经理', count: 128, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=1' },
+                        { name: '张顾问', position: '客户顾问', count: 96, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=2' },
+                        { name: '王经理', position: '市场经理', count: 84, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=3' },
+                        { name: '赵工程师', position: '技术支持', count: 72, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=4' },
+                        { name: '刘专员', position: '客户成功', count: 65, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=5' }
+                    ],
+
+                    quickTags: ['高意向', '待跟进', 'VIP客户', '互联网', '金融', '已签约', '潜在客户'],
+                    
+                    customers: [
+                        {
+                            id: 1,
+                            externalUserid: 'woAJ2GCAAAXtWyujaWJHDDGi0mACHAAA',
+                            name: '李四',
+                            gender: 1,
+                            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=lisi',
+                            corpName: '腾讯科技有限公司',
+                            position: '采购经理',
+                            tags: [
+                                { name: '高意向', color: 'blue' },
+                                { name: '互联网', color: 'green' },
+                                { name: 'VIP客户', color: 'red' }
+                            ],
+                            followers: [
+                                { id: 1, name: '李销售', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=1', remark: '李部长', addTime: '2024-01-15' },
+                                { id: 2, name: '张顾问', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=2', remark: '李总', addTime: '2024-01-20' }
+                            ],
+                            lastFollowTime: '2024-01-28 14:30',
+                            followCount: 12,
+                            status: 'normal',
+                            source: '扫码添加',
+                            created_at: '2024-01-15',
+                            unionid: 'ozynqsulJFCZ2z1aYeS8h-nuasdAAA',
+                            recentFollows: [
+                                { id: 1, type: 'phone', typeText: '电话', content: '沟通了产品报价方案，客户表示需要考虑', time: '2024-01-28 14:30' },
+                                { id: 2, type: 'wechat', typeText: '微信', content: '发送了产品介绍PDF，客户已查看', time: '2024-01-27 10:15' }
+                            ]
+                        },
+                        {
+                            id: 2,
+                            externalUserid: 'woAJ2GCAAAXtWyujaWJHDDGi0mACHBBB',
+                            name: '王芳',
+                            gender: 2,
+                            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=wangfang',
+                            corpName: '阿里巴巴网络技术有限公司',
+                            position: 'HR总监',
+                            tags: [
+                                { name: '待跟进', color: 'orange' },
+                                { name: '金融', color: 'purple' }
+                            ],
+                            followers: [
+                                { id: 1, name: '李销售', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=1', remark: '王总监', addTime: '2024-01-20' }
+                            ],
+                            lastFollowTime: '2024-01-26 09:00',
+                            followCount: 5,
+                            status: 'normal',
+                            source: '名片分享',
+                            created_at: '2024-01-20'
+                        },
+                        {
+                            id: 3,
+                            externalUserid: 'woAJ2GCAAAXtWyujaWJHDDGi0mACHCCC',
+                            name: '张伟',
+                            gender: 1,
+                            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=zhangwei',
+                            corpName: '',
+                            position: '自由职业者',
+                            tags: [
+                                { name: '潜在客户', color: 'blue' }
+                            ],
+                            followers: [
+                                { id: 3, name: '王经理', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=3', remark: '', addTime: '2024-01-25' }
+                            ],
+                            lastFollowTime: null,
+                            followCount: 0,
+                            status: 'lost',
+                            source: '搜索手机号',
+                            created_at: '2024-01-25'
+                        }
+                    ],
+
+                    totalCustomers: 1284,
+
+                    departments: [
+                        { id: 1, name: '全公司', count: 45, level: 0, children: true },
+                        { id: 2, name: '销售部', count: 12, level: 1 },
+                        { id: 3, name: '技术部', count: 18, level: 1 },
+                        { id: 4, name: '市场部', count: 8, level: 1 },
+                        { id: 5, name: '运营部', count: 7, level: 1 }
+                    ],
+
+                    employees: [
+                        { id: 1, name: '李销售', position: '销售经理', mobile: '13800000001', email: 'lisales@company.com', status: 1, customer_count: 128, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=1' },
+                        { id: 2, name: '张顾问', position: '客户顾问', mobile: '13800000002', email: 'zhangadvisor@company.com', status: 1, customer_count: 96, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=2' },
+                        { id: 3, name: '王经理', position: '市场经理', mobile: '13800000003', email: 'wangmanager@company.com', status: 1, customer_count: 84, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=3' },
+                        { id: 4, name: '赵工程师', position: '技术支持', mobile: '13800000004', email: 'zhaoeng@company.com', status: 1, customer_count: 72, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=4' }
+                    ],
+
+                    recentFollows: [
+                        { id: 1, customerName: '李四', customerAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=lisi', employeeName: '李销售', type: 'phone', typeText: '电话', content: '沟通了产品报价方案，客户表示需要考虑...', time: '10分钟前' },
+                        { id: 2, customerName: '王芳', customerAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=wangfang', employeeName: '张顾问', type: 'wechat', typeText: '微信', content: '发送了公司介绍资料，约明天下午面谈', time: '30分钟前' },
+                        { id: 3, customerName: '陈总', customerAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=chen', employeeName: '李销售', type: 'meeting', typeText: '拜访', content: '线下拜访，讨论了合作细节，意向强烈', time: '2小时前' }
+                    ],
+
+                    groupedFollows: {
+                        '2024-01-28': [
+                            { id: 1, customerName: '李四', customerAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=lisi', corpName: '腾讯科技', employeeName: '李销售', employeeAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=1', type: 'phone', typeText: '电话沟通', content: '沟通了产品报价方案，客户对高级版功能很感兴趣，但表示需要考虑预算问题。预计下周给回复。', feedback: '希望能有分期付款方案', time: '14:30', duration: 15 },
+                            { id: 2, customerName: '王芳', customerAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=wangfang', corpName: '阿里巴巴', employeeName: '张顾问', employeeAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=2', type: 'wechat', typeText: '微信沟通', content: '客户询问了API对接文档，已发送技术文档和示例代码。', feedback: '', time: '10:15', duration: null }
+                        ],
+                        '2024-01-27': [
+                            { id: 3, customerName: '陈总', customerAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=chen', corpName: '字节跳动', employeeName: '李销售', employeeAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=1', type: 'meeting', typeText: '线下拜访', content: '前往客户公司进行了产品演示，展示了最新版本的CRM功能。客户对智能标签功能特别满意。', feedback: '希望能尽快上线使用', time: '16:00', duration: 120 }
+                        ]
+                    },
+
+                    todayTodos: [
+                        { id: 1, customerName: '李四', time: '15:00', plan: '确认预算审批进度，发送分期付款方案' },
+                        { id: 2, customerName: '王芳', time: '16:30', plan: '技术对接会议，讨论API集成细节' }
+                    ],
+
+                    followStats: [
+                        { name: '电话沟通', count: 45, icon: 'fas fa-phone', bgColor: 'bg-blue-500' },
+                        { name: '微信沟通', count: 128, icon: 'fas fa-comments', bgColor: 'bg-green-500' },
+                        { name: '线下拜访', count: 12, icon: 'fas fa-handshake', bgColor: 'bg-purple-500' },
+                        { name: '邮件往来', count: 34, icon: 'fas fa-envelope', bgColor: 'bg-orange-500' }
+                    ]
+                }
+            },
+            methods: {
+                getFollowTypeClass(type) {
+                    const map = {
+                        'phone': 'ant-tag-blue',
+                        'wechat': 'ant-tag-green',
+                        'meeting': 'ant-tag-purple',
+                        'email': 'ant-tag-orange',
+                        'visit': 'ant-tag-red',
+                        'other': 'ant-tag-gray'
+                    };
+                    return map[type] || 'ant-tag-blue';
+                },
+                getFollowTypeIcon(type) {
+                    const map = {
+                        'phone': 'fas fa-phone',
+                        'wechat': 'fas fa-comments',
+                        'meeting': 'fas fa-handshake',
+                        'email': 'fas fa-envelope',
+                        'visit': 'fas fa-walking',
+                        'other': 'fas fa-ellipsis-h'
+                    };
+                    return map[type] || 'fas fa-circle';
+                },
+                openCustomerDetail(customer) {
+                    this.selectedCustomer = customer;
+                    this.customerDetailVisible = true;
+                },
+                toggleTag(tag) {
+                    const index = this.selectedTags.indexOf(tag);
+                    if (index > -1) {
+                        this.selectedTags.splice(index, 1);
+                    } else {
+                        this.selectedTags.push(tag);
+                    }
+                },
+                startSync() {
+                    this.isSyncing = true;
+                    this.syncProgress = 0;
+                    this.syncStatusText = '正在连接企业微信服务器...';
+                    
+                    // 模拟同步过程
+                    const interval = setInterval(() => {
+                        this.syncProgress += Math.floor(Math.random() * 15) + 5;
+                        if (this.syncProgress > 100) this.syncProgress = 100;
+                        
+                        if (this.syncProgress < 30) {
+                            this.syncStatusText = '正在获取 AccessToken...';
+                        } else if (this.syncProgress < 60) {
+                            this.syncStatusText = '正在同步客户数据...';
+                        } else if (this.syncProgress < 90) {
+                            this.syncStatusText = '正在同步员工信息...';
+                        } else {
+                            this.syncStatusText = '正在保存到数据库...';
+                        }
+                        
+                        if (this.syncProgress >= 100) {
+                            clearInterval(interval);
+                            setTimeout(() => {
+                                this.isSyncing = false;
+                                this.syncComplete = true;
+                                this.syncResult = { success: 156, failed: 2 };
+                            }, 500);
+                        }
+                    }, 300);
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
