@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import HomeView from '@/views/HomeView.vue'
 import CustomerList from '@/components/customer/index.vue'
 
 const router = createRouter({
@@ -6,7 +7,11 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/customers',
+      name: 'Home',
+      component: HomeView,
+      meta: {
+        title: '首页',
+      },
     },
     {
       path: '/customers',

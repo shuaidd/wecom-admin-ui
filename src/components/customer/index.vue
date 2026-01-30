@@ -155,6 +155,7 @@ onMounted(() => {
 
 <style scoped>
 .customer-list-container {
+  color: inherit;
 }
 
 .action-bar {
