@@ -1,10 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MainLayout from '@/layouts/MainLayout.vue'
 import ParentLayout from '@/layouts/ParentLayout.vue'
+import { useUserStore } from '@/stores/user'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('@/pages/login/login.vue'),
+      meta: { title: '登录' },
+    },
     {
       path: '/',
       component: MainLayout,
@@ -104,6 +111,15 @@ const router = createRouter({
       redirect: '/exception/404',
     },
   ],
+})
+
+router.beforeEach((to, from, next) => {
+  const userStore = useUserStore()
+  if (to.path !== '/login' && !userStore.token) {
+    next('/login')
+  } else {
+    next()
+  }
 })
 
 export default router

@@ -2,6 +2,7 @@
 import { ref, watch, onMounted, computed, type Component } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useTabStore } from '@/stores/tab'
+import { useUserStore } from '@/stores/user'
 import * as Icons from '@ant-design/icons-vue'
 
 const {
@@ -22,6 +23,7 @@ const {
 const route = useRoute()
 const router = useRouter()
 const tabStore = useTabStore()
+const userStore = useUserStore()
 
 const collapsed = ref(false)
 const selectedKeys = ref<string[]>([route.path])
@@ -39,6 +41,12 @@ const menuItems = computed(() => {
 const handleMenuClick = ({ key }: { key: string }) => {
   if (key !== route.path) {
     router.push(key)
+  }
+}
+
+const handleUserMenuClick = ({ key }: { key: string }) => {
+  if (key === 'logout') {
+    userStore.logout()
   }
 }
 
@@ -258,7 +266,7 @@ watch(
                   </transition>
                 </div>
                 <template #overlay>
-                  <a-menu>
+                  <a-menu @click="handleUserMenuClick">
                     <a-menu-item key="profile">
                       <UserOutlined />
                       <span>个人中心</span>
