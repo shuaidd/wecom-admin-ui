@@ -90,6 +90,8 @@ src/
 ### Component Library
 
 - **MUST use ant-design-vue 4.2.6+** - This version requirement is mandatory for all UI components
+- **Implementation choices**: Use either Vue 3 native implementation or ant-design-vue components
+- **No additional third-party packages**: Do NOT add new third-party packages without justification
 
 ## Quality Checks Required
 
