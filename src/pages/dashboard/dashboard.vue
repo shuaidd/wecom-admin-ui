@@ -9,8 +9,10 @@ export default defineComponent({
 <script setup lang="ts"></script>
 
 <template>
-  <h1>Dashboard Page</h1>
-  <p>This is the dashboard page</p>
+  <div>
+    <h1>Dashboard Page</h1>
+    <p>This is the dashboard page</p>
+  </div>
 </template>
 
 <style scoped></style>
