@@ -17,7 +17,8 @@
 
 <script setup lang="ts">
 const getTarget = () => {
-  return document.querySelector('.content-wrapper')
+  const el = document.querySelector('.content-wrapper')
+  return el as HTMLElement
 }
 </script>
 

@@ -3,9 +3,7 @@ import { ref, watch, onMounted, computed, type Component } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useTabStore } from '@/stores/tab'
 import { useUserStore } from '@/stores/user'
-import * as Icons from '@ant-design/icons-vue'
-
-const {
+import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
   SearchOutlined,
@@ -18,7 +16,40 @@ const {
   FullscreenExitOutlined,
   ThunderboltOutlined,
   StarOutlined,
-} = Icons
+  InfoCircleOutlined,
+  HomeOutlined,
+  DashboardOutlined,
+  AppstoreOutlined,
+  FileTextOutlined,
+  FormOutlined,
+  ExperimentOutlined,
+  ExceptionOutlined,
+  TeamOutlined,
+} from '@ant-design/icons-vue'
+
+const iconMap: Record<string, Component> = {
+  MenuUnfoldOutlined,
+  MenuFoldOutlined,
+  SearchOutlined,
+  BellOutlined,
+  UserOutlined,
+  SettingOutlined,
+  LogoutOutlined,
+  QuestionCircleOutlined,
+  FullscreenOutlined,
+  FullscreenExitOutlined,
+  ThunderboltOutlined,
+  StarOutlined,
+  InfoCircleOutlined,
+  HomeOutlined,
+  DashboardOutlined,
+  AppstoreOutlined,
+  FileTextOutlined,
+  FormOutlined,
+  ExperimentOutlined,
+  ExceptionOutlined,
+  TeamOutlined,
+}
 
 const route = useRoute()
 const router = useRouter()
@@ -38,25 +69,27 @@ const menuItems = computed(() => {
   return rootRoute?.children || []
 })
 
-const handleMenuClick = ({ key }: { key: string }) => {
+const handleMenuClick = ({ key }: { key: string | number }) => {
   if (key !== route.path) {
-    router.push(key)
+    router.push(key as string)
   }
 }
 
-const handleUserMenuClick = ({ key }: { key: string }) => {
+const handleUserMenuClick = ({ key }: { key: string | number }) => {
   if (key === 'logout') {
     userStore.logout()
   }
 }
 
 const handleTabChange = (key: string | number) => {
-  tabStore.switchTab(key as string)
+  if (key !== route.path) {
+    router.push(key as string)
+  }
 }
 
-const handleTabEdit = (targetKey: string | number, action: 'add' | 'remove') => {
-  if (action === 'remove') {
-    tabStore.removeTab(targetKey as string)
+const handleTabEdit = (targetKey: string | number | MouseEvent, action: 'add' | 'remove') => {
+  if (action === 'remove' && typeof targetKey === 'string') {
+    tabStore.removeTab(targetKey)
   }
 }
 
@@ -76,8 +109,8 @@ const toggleTheme = () => {
 }
 
 const getIcon = (iconName?: string): Component => {
-  if (!iconName) return Icons.InfoCircleOutlined
-  return (Icons as Record<string, Component>)[iconName] || Icons.InfoCircleOutlined
+  if (!iconName) return InfoCircleOutlined
+  return iconMap[iconName] || InfoCircleOutlined
 }
 
 onMounted(() => {

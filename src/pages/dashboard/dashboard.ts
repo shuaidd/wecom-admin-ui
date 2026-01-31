@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
-import DashboardApp from './dashboard.vue'
+import DashboardApp from './DashboardPage.vue'
 
 const app = createApp(DashboardApp)
 

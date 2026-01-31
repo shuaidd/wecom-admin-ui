@@ -166,7 +166,7 @@ class Particle {
     this.size = Math.random() * 2 + 1
     // 科技蓝/青色系
     const colors = ['rgba(99, 102, 241, 0.5)', 'rgba(139, 92, 246, 0.5)', 'rgba(6, 182, 212, 0.5)']
-    this.color = colors[Math.floor(Math.random() * colors.length)]
+    this.color = colors[Math.floor(Math.random() * colors.length)]!
   }
 
   update(width: number, height: number) {
@@ -231,16 +231,20 @@ const initCanvas = () => {
     const maxDist = 100
     for (let i = 0; i < particles.length; i++) {
       for (let j = i + 1; j < particles.length; j++) {
-        const dx = particles[i].x - particles[j].x
-        const dy = particles[i].y - particles[j].y
+        const p1 = particles[i]
+        const p2 = particles[j]
+        if (!p1 || !p2) continue
+
+        const dx = p1.x - p2.x
+        const dy = p1.y - p2.y
         const dist = Math.sqrt(dx * dx + dy * dy)
 
         if (dist < maxDist) {
           ctx.beginPath()
           ctx.strokeStyle = `rgba(148, 163, 184, ${0.15 * (1 - dist / maxDist)})`
           ctx.lineWidth = 1
-          ctx.moveTo(particles[i].x, particles[i].y)
-          ctx.lineTo(particles[j].x, particles[j].y)
+          ctx.moveTo(p1.x, p1.y)
+          ctx.lineTo(p2.x, p2.y)
           ctx.stroke()
         }
       }

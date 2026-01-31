@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
-import AdminApp from './admin.vue'
+import AdminApp from './AdminPage.vue'
 
 const app = createApp(AdminApp)
 
