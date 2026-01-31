@@ -9,7 +9,7 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: () => import('@/pages/login/login.vue'),
+      component: () => import('@/pages/login/LoginPage.vue'),
       meta: { title: '登录' },
     },
     {
@@ -20,7 +20,7 @@ const router = createRouter({
         {
           path: 'dashboard',
           name: 'dashboard',
-          component: () => import('@/pages/dashboard/dashboard.vue'),
+          component: () => import('@/pages/dashboard/DashboardPage.vue'),
           meta: { title: '仪表盘', icon: 'DashboardOutlined' },
         },
         {
@@ -32,7 +32,7 @@ const router = createRouter({
             {
               path: 'basic',
               name: 'form-basic',
-              component: () => import('@/pages/form/basic-form.vue'),
+              component: () => import('@/pages/form/BasicForm.vue'),
               meta: { title: '基础表单' },
             },
           ],
@@ -46,19 +46,19 @@ const router = createRouter({
             {
               path: '403',
               name: 'exception-403',
-              component: () => import('@/pages/exception/error-403.vue'),
+              component: () => import('@/pages/exception/Error403.vue'),
               meta: { title: '403' },
             },
             {
               path: '404',
               name: 'exception-404',
-              component: () => import('@/pages/exception/error-404.vue'),
+              component: () => import('@/pages/exception/Error404.vue'),
               meta: { title: '404' },
             },
             {
               path: '500',
               name: 'exception-500',
-              component: () => import('@/pages/exception/error-500.vue'),
+              component: () => import('@/pages/exception/Error500.vue'),
               meta: { title: '500' },
             },
           ],
@@ -72,7 +72,7 @@ const router = createRouter({
             {
               path: 'long-content',
               name: 'long-content',
-              component: () => import('@/pages/demo/long-content.vue'),
+              component: () => import('@/pages/demo/LongContent.vue'),
               meta: { title: '超长内容' },
             },
             {
@@ -84,24 +84,18 @@ const router = createRouter({
                 {
                   path: 'menu1',
                   name: 'nested-menu1',
-                  component: () => import('@/pages/demo/nested/nested-menu1.vue'),
+                  component: () => import('@/pages/demo/nested/NestedMenu1.vue'),
                   meta: { title: '菜单 1-1' },
                 },
                 {
                   path: 'menu2',
                   name: 'nested-menu2',
-                  component: () => import('@/pages/demo/nested/nested-menu2.vue'),
+                  component: () => import('@/pages/demo/nested/NestedMenu2.vue'),
                   meta: { title: '菜单 1-2' },
                 },
               ],
             },
           ],
-        },
-        {
-          path: 'admin',
-          name: 'admin',
-          component: () => import('@/pages/admin/admin.vue'),
-          meta: { title: '系统管理', icon: 'SettingOutlined' },
         },
       ],
     },

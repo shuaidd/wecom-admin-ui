@@ -48,7 +48,7 @@ npm run format           # Format code with Prettier
 
 - **Stores**: `useXxxStore` pattern (e.g., `useCounterStore`)
 - **Components**: PascalCase (e.g., `UserList.vue`)
-- **Files**: kebab-case for components (e.g., `user-list.vue`)
+- **Files**: PascalCase for component files (e.g., `UserList.vue`)
 - **Functions/Variables**: camelCase
 - **Test files**: `*.spec.ts` in `src/__tests__/`
 
@@ -90,6 +90,12 @@ src/
 ### Component Library
 
 - **MUST use ant-design-vue 4.2.6+** - This version requirement is mandatory for all UI components
+
+### Component Naming Rules
+
+- **Component files MUST use PascalCase** (e.g., `UserList.vue`, `LoginPage.vue`, `Error404.vue`)
+- **NEVER use kebab-case for component files** (e.g., do not use `user-list.vue`)
+- This rule is mandatory for all new Vue component files created in the project
 
 ## Quality Checks Required
 

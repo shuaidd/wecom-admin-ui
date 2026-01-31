@@ -25,5 +25,11 @@ export default defineConfigWithVueTs(
     files: ['src/**/__tests__/*'],
   },
 
+  {
+    rules: {
+      'vue/multi-word-component-names': 'off',
+    },
+  },
+
   skipFormatting,
 )
