@@ -3,6 +3,8 @@ import { ref, watch, onMounted, computed, type Component } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useTabStore } from '@/stores/tab'
 import { useUserStore } from '@/stores/user'
+import type { TabsProps } from 'ant-design-vue'
+import type { RouteRecordRaw } from 'vue-router'
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -64,9 +66,19 @@ const searchValue = ref('')
 const isDark = ref(false)
 const notificationCount = ref(5)
 
+const filterHiddenRoutes = (routes: RouteRecordRaw[]) => {
+  return routes.filter((route) => {
+    if (route.meta?.hidden) return false
+    if (route.children && route.children.length > 0) {
+      route.children = filterHiddenRoutes(route.children)
+    }
+    return true
+  })
+}
+
 const menuItems = computed(() => {
   const rootRoute = router.options.routes.find((r) => r.path === '/')
-  return rootRoute?.children || []
+  return filterHiddenRoutes(rootRoute?.children || [])
 })
 
 const handleMenuClick = ({ key }: { key: string | number }) => {
@@ -87,7 +99,7 @@ const handleTabChange = (key: string | number) => {
   }
 }
 
-const handleTabEdit = (targetKey: string | number | MouseEvent, action: 'add' | 'remove') => {
+const handleTabEdit: TabsProps['onEdit'] = (targetKey, action) => {
   if (action === 'remove' && typeof targetKey === 'string') {
     tabStore.removeTab(targetKey)
   }

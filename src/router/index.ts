@@ -24,6 +24,46 @@ const router = createRouter({
           meta: { title: '仪表盘', icon: 'DashboardOutlined' },
         },
         {
+          path: 'customer',
+          name: 'customer',
+          component: ParentLayout,
+          meta: { title: '客户管理', icon: 'TeamOutlined' },
+          children: [
+            {
+              path: 'list',
+              name: 'customer-list',
+              component: () => import('@/pages/customer/CustomerList.vue'),
+              meta: { title: '客户列表' },
+            },
+            {
+              path: 'detail/:id',
+              name: 'customer-detail',
+              component: () => import('@/pages/customer/CustomerDetail.vue'),
+              meta: { title: '客户详情', hidden: true },
+            },
+          ],
+        },
+        {
+          path: 'contacts',
+          name: 'contacts',
+          component: ParentLayout,
+          meta: { title: '通讯录管理', icon: 'ContactsOutlined' },
+          children: [
+            {
+              path: 'users',
+              name: 'contacts-users',
+              component: () => import('@/pages/contacts/UserList.vue'),
+              meta: { title: '用户管理' },
+            },
+            {
+              path: 'departments',
+              name: 'contacts-departments',
+              component: () => import('@/pages/contacts/DepartmentList.vue'),
+              meta: { title: '部门管理' },
+            },
+          ],
+        },
+        {
           path: 'form',
           name: 'form',
           component: ParentLayout,
@@ -34,6 +74,20 @@ const router = createRouter({
               name: 'form-basic',
               component: () => import('@/pages/form/BasicForm.vue'),
               meta: { title: '基础表单' },
+            },
+          ],
+        },
+        {
+          path: 'marketing',
+          name: 'marketing',
+          component: ParentLayout,
+          meta: { title: '营销中心', icon: 'RocketOutlined' },
+          children: [
+            {
+              path: 'mass-message',
+              name: 'marketing-mass-message',
+              component: () => import('@/pages/marketing/mass-message/MassMessagePage.vue'),
+              meta: { title: '群发消息' },
             },
           ],
         },
