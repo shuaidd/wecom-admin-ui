@@ -36,6 +36,12 @@ const router = createRouter({
               meta: { title: '客户列表' },
             },
             {
+              path: 'funnel',
+              name: 'customer-funnel',
+              component: () => import('@/pages/customer/funnel/FunnelPage.vue'),
+              meta: { title: '获客漏斗' },
+            },
+            {
               path: 'detail/:id',
               name: 'customer-detail',
               component: () => import('@/pages/customer/CustomerDetail.vue'),
@@ -84,6 +90,18 @@ const router = createRouter({
           meta: { title: '营销中心', icon: 'RocketOutlined' },
           children: [
             {
+              path: 'acquisition-link',
+              name: 'marketing-acquisition-link',
+              component: () => import('@/pages/marketing/acquisition-link/AcquisitionLinkPage.vue'),
+              meta: { title: '获客链接' },
+            },
+            {
+              path: 'channel-code',
+              name: 'marketing-channel-code',
+              component: () => import('@/pages/marketing/channel-code/ChannelCodePage.vue'),
+              meta: { title: '渠道活码' },
+            },
+            {
               path: 'mass-message',
               name: 'marketing-mass-message',
               component: () => import('@/pages/marketing/mass-message/MassMessagePage.vue'),
@@ -94,6 +112,12 @@ const router = createRouter({
               name: 'marketing-channel-stats',
               component: () => import('@/pages/marketing/channel-stats/ChannelStatsPage.vue'),
               meta: { title: '渠道统计' },
+            },
+            {
+              path: 'welcome',
+              name: 'marketing-welcome',
+              component: () => import('@/pages/marketing/welcome/WelcomePage.vue'),
+              meta: { title: '欢迎语管理' },
             },
           ],
         },
