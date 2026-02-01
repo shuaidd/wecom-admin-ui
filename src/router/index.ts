@@ -89,6 +89,12 @@ const router = createRouter({
               component: () => import('@/pages/marketing/mass-message/MassMessagePage.vue'),
               meta: { title: '群发消息' },
             },
+            {
+              path: 'channel-stats',
+              name: 'marketing-channel-stats',
+              component: () => import('@/pages/marketing/channel-stats/ChannelStatsPage.vue'),
+              meta: { title: '渠道统计' },
+            },
           ],
         },
         {
