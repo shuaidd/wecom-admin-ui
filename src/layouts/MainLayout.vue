@@ -124,10 +124,12 @@ watch(
   () => route.path,
   (newPath) => {
     selectedKeys.value = [newPath]
-    const paths = newPath.split('/').filter(Boolean)
-    if (paths.length > 1) {
-      const parents = paths.slice(0, -1).map((_, i) => '/' + paths.slice(0, i + 1).join('/'))
-      openKeys.value = [...new Set([...openKeys.value, ...parents])]
+    if (!collapsed.value) {
+      const paths = newPath.split('/').filter(Boolean)
+      if (paths.length > 1) {
+        const parents = paths.slice(0, -1).map((_, i) => '/' + paths.slice(0, i + 1).join('/'))
+        openKeys.value = [...new Set([...openKeys.value, ...parents])]
+      }
     }
     tabStore.addTab(route)
   },
