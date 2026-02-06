@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { SearchOutlined, ExportOutlined, PlusOutlined, EyeOutlined } from '@ant-design/icons-vue'
+import {
+  SearchOutlined,
+  ExportOutlined,
+  PlusOutlined,
+  EyeOutlined,
+  IdcardOutlined,
+} from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 
 const router = useRouter()
@@ -173,7 +179,7 @@ const columns = [
   {
     title: '操作',
     key: 'action',
-    width: 100,
+    width: 180,
     fixed: 'right' as const,
   },
 ]
@@ -196,6 +202,10 @@ const handleAddFollow = () => {
 
 const handleView = (record: Customer) => {
   router.push({ name: 'customer-detail', params: { id: record.id } })
+}
+
+const handlePortrait = (record: Customer) => {
+  router.push({ name: 'customer-portrait', params: { id: record.id } })
 }
 
 const handleTableChange = (pag: { current?: number; pageSize?: number }) => {
@@ -323,12 +333,20 @@ onMounted(() => {
           </template>
 
           <template v-else-if="column.key === 'action'">
-            <a-button type="link" size="small" @click="handleView(record as Customer)">
-              <template #icon>
-                <EyeOutlined />
-              </template>
-              查看
-            </a-button>
+            <a-space :size="2">
+              <a-button type="link" size="small" @click="handleView(record as Customer)">
+                <template #icon>
+                  <EyeOutlined />
+                </template>
+                查看
+              </a-button>
+              <a-button type="link" size="small" @click="handlePortrait(record as Customer)">
+                <template #icon>
+                  <IdcardOutlined />
+                </template>
+                客户画像
+              </a-button>
+            </a-space>
           </template>
         </template>
       </a-table>

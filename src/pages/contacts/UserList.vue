@@ -6,6 +6,7 @@ import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
+  FolderOutlined,
 } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { Modal } from 'ant-design-vue'
@@ -31,12 +32,20 @@ const selectedDepartment = ref('all')
 const selectedStatus = ref('all')
 const loading = ref(false)
 
-const departmentOptions = [
-  { label: '所有部门', value: 'all' },
-  { label: '技术部', value: 'tech' },
-  { label: '产品部', value: 'product' },
-  { label: '运营部', value: 'operation' },
-  { label: '市场部', value: 'marketing' },
+const treeSearchValue = ref('')
+const selectedTreeKeys = ref<string[]>(['all'])
+
+const treeData = [
+  {
+    title: '微伴科技',
+    key: 'all',
+    children: [
+      { title: '技术部', key: 'tech' },
+      { title: '产品部', key: 'product' },
+      { title: '运营部', key: 'operation' },
+      { title: '市场部', key: 'marketing' },
+    ],
+  },
 ]
 
 const statusOptions = [
@@ -44,6 +53,13 @@ const statusOptions = [
   { label: '在职', value: 'active' },
   { label: '离职', value: 'inactive' },
 ]
+
+const onTreeSelect = (keys: (string | number)[]) => {
+  if (keys.length > 0) {
+    selectedDepartment.value = String(keys[0])
+    handleSearch()
+  }
+}
 
 const dataSource = ref<User[]>([
   {
@@ -261,121 +277,159 @@ onMounted(() => {
       </div>
     </div>
 
-    <div class="table-wrapper">
-      <div class="table-toolbar">
-        <a-space :size="16" wrap>
-          <a-input
-            v-model:value="searchValue"
-            placeholder="搜索姓名、手机号或邮箱..."
-            style="width: 280px"
-            @pressEnter="handleSearch"
-          >
-            <template #prefix>
-              <SearchOutlined />
-            </template>
-            <template #suffix>
-              <a-button type="link" size="small" @click="handleSearch"> 搜索 </a-button>
-            </template>
+    <div class="main-container">
+      <div class="side-tree-wrapper">
+        <div class="tree-header">
+          <span class="tree-title">组织架构</span>
+          <a-button type="link" size="small">
+            <template #icon><PlusOutlined /></template>
+          </a-button>
+        </div>
+        <div class="tree-search">
+          <a-input v-model:value="treeSearchValue" placeholder="搜索部门..." size="small">
+            <template #prefix><SearchOutlined /></template>
           </a-input>
-
-          <a-select v-model:value="selectedDepartment" style="width: 140px">
-            <a-select-option v-for="opt in departmentOptions" :key="opt.value" :value="opt.value">
-              {{ opt.label }}
-            </a-select-option>
-          </a-select>
-
-          <a-select v-model:value="selectedStatus" style="width: 140px">
-            <a-select-option v-for="opt in statusOptions" :key="opt.value" :value="opt.value">
-              {{ opt.label }}
-            </a-select-option>
-          </a-select>
-        </a-space>
+        </div>
+        <div class="tree-body">
+          <a-tree
+            v-model:selectedKeys="selectedTreeKeys"
+            :tree-data="treeData"
+            default-expand-all
+            block-node
+            @select="onTreeSelect"
+          >
+            <template #title="{ title }">
+              <div class="tree-node-content">
+                <FolderOutlined class="node-icon" />
+                <span class="node-title">{{ title }}</span>
+              </div>
+            </template>
+          </a-tree>
+        </div>
       </div>
 
-      <a-table
-        :columns="columns"
-        :data-source="dataSource"
-        :pagination="pagination"
-        :loading="loading"
-        :scroll="{ x: 1200 }"
-        @change="handleTableChange"
-        class="user-table"
-      >
-        <template #bodyCell="{ column, record }">
-          <template v-if="column.key === 'user'">
-            <div class="user-info">
-              <a-avatar :size="40" :style="{ background: (record as User).avatar }">
-                {{ (record as User).name.charAt(0) }}
-              </a-avatar>
-              <div class="user-detail">
-                <div class="user-name">{{ (record as User).name }}</div>
-                <div class="user-meta">
-                  {{ (record as User).gender === 'male' ? '男' : '女' }}
-                </div>
-              </div>
-            </div>
-          </template>
-
-          <template v-else-if="column.key === 'account'">
-            <div class="account-info">
-              <div class="account-item">
-                <span class="account-label">工号:</span>
-                <span class="account-value">{{ (record as User).userId }}</span>
-              </div>
-              <div class="account-item">
-                <span class="account-label">手机:</span>
-                <span class="account-value">{{ (record as User).phone }}</span>
-              </div>
-              <div class="account-item">
-                <span class="account-label">邮箱:</span>
-                <span class="account-value">{{ (record as User).email }}</span>
-              </div>
-            </div>
-          </template>
-
-          <template v-else-if="column.key === 'department'">
-            <div class="department-info">
-              <div class="department-name">{{ (record as User).department }}</div>
-              <div class="department-position">{{ (record as User).position }}</div>
-            </div>
-          </template>
-
-          <template v-else-if="column.key === 'tags'">
-            <a-space :size="4" wrap>
-              <a-tag
-                v-for="(tag, index) in (record as User).tags"
-                :key="index"
-                :class="getTagClass((record as User).tagsType[index] || 'blue')"
+      <div class="table-content-wrapper">
+        <div class="table-toolbar">
+          <div class="toolbar-left">
+            <a-space :size="16" wrap>
+              <a-input
+                v-model:value="searchValue"
+                placeholder="搜索姓名、手机号或邮箱..."
+                style="width: 280px"
+                @pressEnter="handleSearch"
               >
-                {{ tag }}
-              </a-tag>
-            </a-space>
-          </template>
-
-          <template v-else-if="column.key === 'status'">
-            <a-tag :class="getStatusClass((record as User).status)">
-              {{ getStatusText((record as User).status) }}
-            </a-tag>
-          </template>
-
-          <template v-else-if="column.key === 'action'">
-            <a-space :size="4">
-              <a-button type="link" size="small" @click="handleEdit(record as User)">
-                <template #icon>
-                  <EditOutlined />
+                <template #prefix>
+                  <SearchOutlined />
                 </template>
-                编辑
-              </a-button>
-              <a-button type="link" size="small" danger @click="handleDelete(record as User)">
-                <template #icon>
-                  <DeleteOutlined />
+                <template #suffix>
+                  <a-button type="link" size="small" @click="handleSearch"> 搜索 </a-button>
                 </template>
-                删除
-              </a-button>
+              </a-input>
+
+              <a-select v-model:value="selectedStatus" style="width: 140px">
+                <a-select-option v-for="opt in statusOptions" :key="opt.value" :value="opt.value">
+                  {{ opt.label }}
+                </a-select-option>
+              </a-select>
             </a-space>
-          </template>
-        </template>
-      </a-table>
+          </div>
+          <div class="toolbar-right">
+            <a-button @click="handleExport">
+              <template #icon>
+                <ExportOutlined />
+              </template>
+              导出
+            </a-button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <a-table
+            :columns="columns"
+            :data-source="dataSource"
+            :pagination="pagination"
+            :loading="loading"
+            :scroll="{ x: 1000 }"
+            @change="handleTableChange"
+            class="user-table"
+          >
+            <template #bodyCell="{ column, record }">
+              <template v-if="column.key === 'user'">
+                <div class="user-info">
+                  <a-avatar :size="40" :style="{ background: (record as User).avatar }">
+                    {{ (record as User).name.charAt(0) }}
+                  </a-avatar>
+                  <div class="user-detail">
+                    <div class="user-name">{{ (record as User).name }}</div>
+                    <div class="user-meta">
+                      {{ (record as User).gender === 'male' ? '男' : '女' }}
+                    </div>
+                  </div>
+                </div>
+              </template>
+
+              <template v-else-if="column.key === 'account'">
+                <div class="account-info">
+                  <div class="account-item">
+                    <span class="account-label">工号:</span>
+                    <span class="account-value">{{ (record as User).userId }}</span>
+                  </div>
+                  <div class="account-item">
+                    <span class="account-label">手机:</span>
+                    <span class="account-value">{{ (record as User).phone }}</span>
+                  </div>
+                  <div class="account-item">
+                    <span class="account-label">邮箱:</span>
+                    <span class="account-value">{{ (record as User).email }}</span>
+                  </div>
+                </div>
+              </template>
+
+              <template v-else-if="column.key === 'department'">
+                <div class="department-info">
+                  <div class="department-name">{{ (record as User).department }}</div>
+                  <div class="department-position">{{ (record as User).position }}</div>
+                </div>
+              </template>
+
+              <template v-else-if="column.key === 'tags'">
+                <a-space :size="4" wrap>
+                  <a-tag
+                    v-for="(tag, index) in (record as User).tags"
+                    :key="index"
+                    :class="getTagClass((record as User).tagsType[index] || 'blue')"
+                  >
+                    {{ tag }}
+                  </a-tag>
+                </a-space>
+              </template>
+
+              <template v-else-if="column.key === 'status'">
+                <a-tag :class="getStatusClass((record as User).status)">
+                  {{ getStatusText((record as User).status) }}
+                </a-tag>
+              </template>
+
+              <template v-else-if="column.key === 'action'">
+                <a-space :size="4">
+                  <a-button type="link" size="small" @click="handleEdit(record as User)">
+                    <template #icon>
+                      <EditOutlined />
+                    </template>
+                    编辑
+                  </a-button>
+                  <a-button type="link" size="small" danger @click="handleDelete(record as User)">
+                    <template #icon>
+                      <DeleteOutlined />
+                    </template>
+                    删除
+                  </a-button>
+                </a-space>
+              </template>
+            </template>
+          </a-table>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -425,29 +479,97 @@ onMounted(() => {
   gap: 8px;
 }
 
-.table-wrapper {
+.main-container {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.side-tree-wrapper {
+  width: 280px;
+  background: #fff;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  border: 1px solid #f0f0f0;
+}
+
+.tree-header {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.tree-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.tree-search {
+  padding: 12px 16px;
+}
+
+.tree-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 8px 16px;
+}
+
+.tree-node-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.node-icon {
+  color: #1890ff;
+  font-size: 16px;
+}
+
+.node-title {
+  font-size: 14px;
+}
+
+.table-content-wrapper {
   flex: 1;
   background: #fff;
   border-radius: 8px;
-  box-shadow:
-    0 1px 2px 0 rgba(0, 0, 0, 0.03),
-    0 1px 6px -1px rgba(0, 0, 0, 0.02);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  border: 1px solid #f0f0f0;
 }
 
 .table-toolbar {
   padding: 16px 24px;
   border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
-.table-toolbar :deep(.ant-space) {
-  width: 100%;
+.toolbar-left {
+  flex: 1;
+}
+
+.table-container {
+  flex: 1;
+  overflow: hidden;
 }
 
 .user-table {
-  flex: 1;
+  height: 100%;
 }
 
 .user-table :deep(.ant-table) {
@@ -566,6 +688,18 @@ onMounted(() => {
   color: rgba(0, 0, 0, 0.45);
 }
 
+@media (max-width: 992px) {
+  .main-container {
+    flex-direction: column;
+  }
+
+  .side-tree-wrapper {
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+  }
+}
+
 @media (max-width: 768px) {
   .page-header-content {
     flex-direction: column;
@@ -581,13 +715,13 @@ onMounted(() => {
     padding: 12px;
   }
 
-  .table-toolbar :deep(.ant-space) {
+  .toolbar-left :deep(.ant-space) {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .table-toolbar :deep(.ant-input),
-  .table-toolbar :deep(.ant-select) {
+  .toolbar-left :deep(.ant-input),
+  .toolbar-left :deep(.ant-select) {
     width: 100% !important;
   }
 }
