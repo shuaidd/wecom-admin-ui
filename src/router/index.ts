@@ -47,6 +47,12 @@ const router = createRouter({
               component: () => import('@/pages/customer/CustomerDetail.vue'),
               meta: { title: '客户详情', hidden: true },
             },
+            {
+              path: 'portrait/:id',
+              name: 'customer-portrait',
+              component: () => import('@/pages/customer/CustomerPortrait.vue'),
+              meta: { title: '客户画像', hidden: true },
+            },
           ],
         },
         {
