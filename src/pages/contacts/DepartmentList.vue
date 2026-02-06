@@ -1,6 +1,14 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { SearchOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons-vue'
+import { ref, computed, watch, onMounted } from 'vue'
+import {
+  SearchOutlined,
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  FolderOpenOutlined,
+  FolderOutlined,
+  RightOutlined,
+} from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { Modal } from 'ant-design-vue'
 
@@ -15,11 +23,13 @@ interface Department {
   sort: number
   createTime: string
   status: 'active' | 'inactive'
+  children?: Department[]
 }
 
 const searchValue = ref('')
 const selectedStatus = ref('all')
 const loading = ref(false)
+const expandedKeys = ref<(string | number)[]>([1, 4, 5, 6]) // 默认展开所有父节点
 
 const statusOptions = [
   { label: '所有状态', value: 'all' },
@@ -27,7 +37,8 @@ const statusOptions = [
   { label: '停用', value: 'inactive' },
 ]
 
-const dataSource = ref<Department[]>([
+// 平铺的原始数据
+const flatData = ref<Department[]>([
   {
     id: 1,
     name: '技术部',
@@ -102,59 +113,123 @@ const dataSource = ref<Department[]>([
   },
 ])
 
-const pagination = ref({
-  current: 1,
-  pageSize: 10,
-  total: 50,
-  showSizeChanger: true,
-  showTotal: (total: number) => `共 ${total} 条`,
+/**
+ * 将平铺数据转换为树形结构
+ * @param data 平铺的部门数据
+ * @returns 树形结构的部门数据
+ */
+const buildTreeData = (data: Department[]): Department[] => {
+  const map = new Map<number, Department>()
+  const roots: Department[] = []
+
+  // 第一遍：创建所有节点的映射
+  data.forEach((item) => {
+    map.set(item.id, { ...item, children: [] })
+  })
+
+  // 第二遍：构建父子关系
+  data.forEach((item) => {
+    const node = map.get(item.id)
+    if (!node) return
+
+    if (item.parentId === null || !map.has(item.parentId)) {
+      // 根节点
+      roots.push(node)
+    } else {
+      // 子节点，添加到父节点的 children
+      const parent = map.get(item.parentId)
+      if (parent) {
+        if (!parent.children) {
+          parent.children = []
+        }
+        parent.children.push(node)
+      }
+    }
+  })
+
+  return roots
+}
+
+// 树形数据源
+const dataSource = computed(() => {
+  let data = [...flatData.value]
+
+  // 状态过滤
+  if (selectedStatus.value !== 'all') {
+    data = data.filter((item) => item.status === selectedStatus.value)
+  }
+
+  // 搜索过滤
+  if (searchValue.value) {
+    const keyword = searchValue.value.toLowerCase()
+    data = data.filter((item) => item.name.toLowerCase().includes(keyword))
+  }
+
+  // 转换为树形结构
+  return buildTreeData(data)
+})
+
+// 搜索时自动展开所有匹配节点的父级路径
+watch(searchValue, (newValue) => {
+  if (newValue) {
+    const keyword = newValue.toLowerCase()
+    const filteredData = flatData.value.filter((item) => item.name.toLowerCase().includes(keyword))
+
+    const parentIds = new Set<number>()
+    filteredData.forEach((item) => {
+      let current = item
+      while (current.parentId) {
+        parentIds.add(current.parentId)
+        const parent = flatData.value.find((d) => d.id === current.parentId)
+        if (parent) {
+          current = parent
+        } else {
+          break
+        }
+      }
+    })
+    expandedKeys.value = Array.from(parentIds)
+  }
 })
 
 const columns = [
   {
     title: '部门名称',
     key: 'name',
-    width: 200,
-    customRender: ({ record }: { record: Department }) => record.name,
-  },
-  {
-    title: '上级部门',
-    dataIndex: 'parentName',
-    key: 'parentName',
-    width: 150,
+    width: 280,
   },
   {
     title: '部门负责人',
     key: 'leader',
-    width: 120,
+    width: 150,
   },
   {
     title: '成员数量',
     dataIndex: 'memberCount',
     key: 'memberCount',
-    width: 100,
+    width: 120,
   },
   {
     title: '排序',
     dataIndex: 'sort',
     key: 'sort',
-    width: 80,
+    width: 100,
   },
   {
     title: '状态',
     key: 'status',
-    width: 80,
+    width: 100,
   },
   {
     title: '创建时间',
     dataIndex: 'createTime',
     key: 'createTime',
-    width: 110,
+    width: 130,
   },
   {
     title: '操作',
     key: 'action',
-    width: 180,
+    width: 280,
     fixed: 'right' as const,
   },
 ]
@@ -171,6 +246,10 @@ const handleAdd = () => {
   message.info('添加部门功能开发中...')
 }
 
+const handleAddSub = (record: Department) => {
+  message.info(`添加子部门到: ${record.name}`)
+}
+
 const handleEdit = (record: Department) => {
   message.info(`编辑部门: ${record.name}`)
 }
@@ -178,9 +257,10 @@ const handleEdit = (record: Department) => {
 const handleDelete = (record: Department) => {
   Modal.confirm({
     title: '确认删除',
-    content: `确定要删除部门 ${record.name} 吗?`,
+    content: `确定要删除部门 ${record.name} 吗?${record.children && record.children.length > 0 ? ' 该操作将同时删除所有子部门。' : ''}`,
     okText: '确定',
     cancelText: '取消',
+    okButtonProps: { danger: true },
     onOk: () => {
       message.success('删除成功')
     },
@@ -191,13 +271,13 @@ const handleSort = (record: Department) => {
   message.info(`排序部门: ${record.name}`)
 }
 
-const handleTableChange = (pag: { current?: number; pageSize?: number }) => {
-  if (pag.current) {
-    pagination.value.current = pag.current
-  }
-  if (pag.pageSize) {
-    pagination.value.pageSize = pag.pageSize
-  }
+const handleExpandAll = () => {
+  const allKeys = flatData.value.filter((d) => d.parentId !== null).map((d) => d.parentId!)
+  expandedKeys.value = [...new Set(allKeys)]
+}
+
+const handleCollapseAll = () => {
+  expandedKeys.value = []
 }
 
 const getStatusText = (status: 'active' | 'inactive') => {
@@ -219,14 +299,28 @@ onMounted(() => {
       <div class="page-header-content">
         <div class="page-title-group">
           <h1 class="page-title">部门管理</h1>
-          <p class="page-description">管理企业组织架构，支持创建、编辑、删除、排序等操作</p>
+          <p class="page-description">
+            管理企业组织架构，支持树形层级展示、创建、编辑、删除、排序等操作
+          </p>
         </div>
         <div class="page-header-actions">
+          <a-button @click="handleExpandAll" style="margin-right: 8px">
+            <template #icon>
+              <FolderOpenOutlined />
+            </template>
+            展开全部
+          </a-button>
+          <a-button @click="handleCollapseAll" style="margin-right: 8px">
+            <template #icon>
+              <FolderOutlined />
+            </template>
+            收起全部
+          </a-button>
           <a-button type="primary" @click="handleAdd">
             <template #icon>
               <PlusOutlined />
             </template>
-            添加部门
+            添加根部门
           </a-button>
         </div>
       </div>
@@ -260,41 +354,64 @@ onMounted(() => {
       <a-table
         :columns="columns"
         :data-source="dataSource"
-        :pagination="pagination"
+        :row-key="(record) => record.id"
+        :pagination="false"
         :loading="loading"
-        :scroll="{ x: 1100 }"
-        @change="handleTableChange"
+        :defaultExpandAllRows="false"
+        :expandedRowKeys="expandedKeys"
+        @expandedRowsChange="expandedKeys = $event as (string | number)[]"
+        :scroll="{ x: 1200 }"
         class="department-table"
       >
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'name'">
             <div class="department-name-cell">
-              <a-avatar :size="32" style="background: #1890ff; margin-right: 8px">
-                {{ (record as Department).name.charAt(0) }}
+              <a-avatar
+                :size="32"
+                :style="{
+                  background: record.parentId === null ? '#1890ff' : '#52c41a',
+                  marginRight: '8px',
+                }"
+              >
+                {{ record.name.charAt(0) }}
               </a-avatar>
-              <span class="department-name">{{ (record as Department).name }}</span>
+              <div class="department-name-wrapper">
+                <span class="department-name">{{ record.name }}</span>
+                <span v-if="record.parentId" class="department-sub">{{
+                  (record as Department).parentName
+                }}</span>
+              </div>
             </div>
           </template>
 
           <template v-else-if="column.key === 'leader'">
             <div class="leader-info">
-              <div class="leader-name">{{ (record as Department).leader }}</div>
-              <div class="leader-id">{{ (record as Department).leaderId }}</div>
+              <div class="leader-name">{{ record.leader }}</div>
+              <div class="leader-id">{{ record.leaderId }}</div>
             </div>
           </template>
 
           <template v-else-if="column.key === 'memberCount'">
-            <a-tag color="blue">{{ (record as Department).memberCount }} 人</a-tag>
+            <a-tag color="blue">{{ record.memberCount }} 人</a-tag>
+            <span v-if="record.children && record.children.length > 0" class="child-count">
+              ({{ record.children.length }} 个子部门)
+            </span>
           </template>
 
           <template v-else-if="column.key === 'status'">
-            <a-tag :class="getStatusClass((record as Department).status)">
-              {{ getStatusText((record as Department).status) }}
+            <a-tag :class="getStatusClass(record.status)">
+              {{ getStatusText(record.status) }}
             </a-tag>
           </template>
 
           <template v-else-if="column.key === 'action'">
             <a-space :size="4">
+              <a-button type="link" size="small" @click="handleAddSub(record as Department)">
+                <template #icon>
+                  <PlusOutlined />
+                </template>
+                添加子部门
+              </a-button>
               <a-button type="link" size="small" @click="handleEdit(record as Department)">
                 <template #icon>
                   <EditOutlined />
@@ -303,7 +420,7 @@ onMounted(() => {
               </a-button>
               <a-button type="link" size="small" @click="handleSort(record as Department)">
                 <template #icon>
-                  <PlusOutlined />
+                  <RightOutlined />
                 </template>
                 排序
               </a-button>
@@ -410,14 +527,44 @@ onMounted(() => {
   background: #fafafa;
 }
 
+/* 树形节点样式优化 */
+.department-table :deep(.ant-table-row-indent) {
+  width: 24px;
+}
+
+.department-table :deep(.ant-table-row-expand-icon) {
+  color: rgba(0, 0, 0, 0.45);
+  border: 1px solid #d9d9d9;
+}
+
+.department-table :deep(.ant-table-row-expand-icon:hover) {
+  color: #1890ff;
+  border-color: #1890ff;
+}
+
+.department-table :deep(.ant-table-row-expand-icon-expanded) {
+  background: #f0f8ff;
+}
+
 .department-name-cell {
   display: flex;
   align-items: center;
 }
 
+.department-name-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .department-name {
   font-weight: 500;
   color: rgba(0, 0, 0, 0.85);
+}
+
+.department-sub {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
 }
 
 .leader-info {
@@ -432,6 +579,12 @@ onMounted(() => {
 }
 
 .leader-id {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.child-count {
+  margin-left: 4px;
   font-size: 12px;
   color: rgba(0, 0, 0, 0.45);
 }
@@ -456,7 +609,7 @@ onMounted(() => {
 
   .page-header-actions {
     width: 100%;
-    justify-content: flex-end;
+    flex-wrap: wrap;
   }
 
   .table-toolbar {
