@@ -54,9 +54,9 @@ const statusOptions = [
   { label: '离职', value: 'inactive' },
 ]
 
-const onTreeSelect = (keys: any[]) => {
+const onTreeSelect = (keys: (string | number)[]) => {
   if (keys.length > 0) {
-    selectedDepartment.value = keys[0] as string
+    selectedDepartment.value = String(keys[0])
     handleSearch()
   }
 }
