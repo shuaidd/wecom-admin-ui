@@ -13,6 +13,12 @@ const router = createRouter({
       meta: { title: '登录' },
     },
     {
+      path: '/login-v2',
+      name: 'login-v2',
+      component: () => import('@/pages/login/LoginPageV2.vue'),
+      meta: { title: '登录 V2' },
+    },
+    {
       path: '/',
       component: MainLayout,
       redirect: '/dashboard',
@@ -199,7 +205,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
-  if (to.path !== '/login' && !userStore.token) {
+  if (!['/login', '/login-v2'].includes(to.path) && !userStore.token) {
     next('/login')
   } else {
     next()
